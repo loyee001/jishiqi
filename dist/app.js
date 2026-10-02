@@ -88,10 +88,10 @@
   function renderMusicStatus() {
     let text = '开始计时后播放';
     if (!$('music').checked) text = '音乐已关闭';
-    else if (musicIssue) text = musicIssue;
+    else if (musicIssue || music?.error) text = musicIssue || music.error;
     else if (Number($('music-volume').value) === 0) text = '音量为 0，已静音';
     else if (status === 'paused') text = '已随计时暂停';
-    else if (status === 'running') text = music?.playing ? '正在播放 · 星际漫游' : '正在准备音乐…';
+    else if (status === 'running') text = music?.playing ? '正在播放 · BBC Countdown 2013' : '正在加载在线音乐…';
     else if (status === 'done') text = '计时结束，音乐已停止';
     if ($('music-status').textContent !== text) $('music-status').textContent = text;
     $('music-status').classList.toggle('is-playing', !!(status === 'running' && music?.playing && $('music').checked && Number($('music-volume').value) > 0));
@@ -104,21 +104,17 @@
     }
     musicIssue = ''; renderMusicStatus();
     try {
-      const context = getAudio();
-      if (!context || !window.TimerMusic) throw new Error('unsupported');
-      if (context.state !== 'running') await context.resume();
-      if (revision !== musicRevision || status !== 'running' || !$('music').checked) return;
-      if (context.state !== 'running') throw new Error('blocked');
+      if (!window.TimerMusic) throw new Error('unsupported');
       const limit = mode === 'countdown' ? duration : MAX;
       if (elapsedNow() >= limit) { tick(); return; }
-      music ||= new window.TimerMusic(context, renderMusicStatus);
+      music ||= new window.TimerMusic(renderMusicStatus);
       music.setVolume($('music-volume').value);
-      // Compute after composition so music never outlives the timer deadline.
+      // Keep the online player's stop time aligned with the timer deadline.
       const remaining = (limit - elapsedNow()) / 1000;
       if (remaining <= 0) { tick(); return; }
-      music.start(remaining);
+      await music.start(remaining);
     } catch (_) {
-      if (revision === musicRevision) musicIssue = '音乐未能播放，请关闭后重新开启';
+      if (revision === musicRevision) musicIssue = '音乐未能播放，请检查网络后重新开启';
     }
     renderMusicStatus();
   }
