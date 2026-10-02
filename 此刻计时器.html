@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070d1b">
+  <meta name="description" content="简洁好用的计时器，支持 0–100 小时倒计时与正计时，暂停、继续和到时声音提醒。">
+  <title>此刻 · 100 小时计时器</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%23070d1b'/%3E%3Ccircle cx='20' cy='22' r='12' fill='none' stroke='%2357dbff' stroke-width='3'/%3E%3Cpath d='M20 14v8l5 3M15 4h10' fill='none' stroke='%2357dbff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+:root{color-scheme:dark;--bg:#070d1b;--panel:#0c172a;--muted:#8fa9c1;--text:#e9f5ff;--accent:#57dbff;--line:#203950;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);min-width:280px}button,input,a{-webkit-tap-highlight-color:transparent}button,input{font:inherit}button{cursor:pointer}button:disabled,input:disabled{cursor:default;opacity:.4}button{transition:background .18s,color .18s,transform .18s}button:not(:disabled):active{transform:translateY(1px)}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:5px}svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}[hidden]{display:none!important}.app{max-width:1260px;margin:auto;padding:0 52px}.topbar{height:108px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:13px;color:var(--text);text-decoration:none}.brand-mark{font-size:38px;color:var(--accent);line-height:1}.brand strong{font-size:23px;font-weight:600;letter-spacing:2px}.brand strong span{font-size:14px;letter-spacing:1px;margin-left:13px;color:var(--muted);font-weight:400}.header-end{display:flex;align-items:center;gap:30px}.range-label{font-size:12px;letter-spacing:2px;color:var(--muted)}.icon-button{height:40px;width:40px;border:1px solid var(--line);border-radius:50%;background:transparent;color:var(--muted);display:grid;place-items:center}.icon-button:hover{color:var(--accent);background:#102e45}.intro{padding:43px 0 35px}.eyebrow{font-size:12px;letter-spacing:2px;color:var(--muted)}h1{font-weight:450;font-size:32px;letter-spacing:1px;margin:13px 0 0}h1 span{color:var(--accent)}.workspace{display:grid;grid-template-columns:340px 1fr;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:var(--panel)}.settings{padding:32px 28px;display:flex;flex-direction:column;border-right:1px solid var(--line)}.mode-tabs{display:flex;background:#081321;border:1px solid #203950;border-radius:12px;padding:5px;margin-bottom:35px;gap:4px}.mode-tabs button{flex:1;padding:12px 0;border:0;border-radius:8px;background:none;color:var(--muted);font-size:16px}.mode-tabs button[aria-selected=true]{background:#16354c;color:var(--text)}.section-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:17px;gap:8px}.section-heading h2{font-size:16px;margin:0;font-weight:500}.section-heading>span{font-size:12px;color:var(--muted)}.duration-inputs{display:grid;grid-template-columns:1fr 10px 1fr 10px 1fr;gap:5px;align-items:start}.duration-inputs label{min-width:0;text-align:center}.duration-inputs input{width:100%;padding:16px 0;background:#081321;border:1px solid var(--line);color:var(--text);border-radius:10px;font-family:"SFMono-Regular",Consolas,monospace;font-size:27px;text-align:center;appearance:textfield;-moz-appearance:textfield}.duration-inputs input::-webkit-inner-spin-button,.duration-inputs input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.duration-inputs label>span{display:block;margin-top:10px;color:var(--muted);font-size:14px}.input-colon{padding-top:15px;text-align:center;font-size:25px;color:#6e93ac}.input-error{color:#ffc9a9;font-size:13px;line-height:1.5;min-height:20px;margin:12px 0}.presets{display:grid;grid-template-columns:1fr 1fr;gap:10px}.presets button{border:1px solid var(--line);background:transparent;border-radius:8px;color:var(--muted);padding:11px 4px;font-size:14px}.presets button:hover,.presets button.selected{border-color:#3884a5;color:var(--accent);background:#103447}.settings-bottom{margin-top:auto;padding-top:52px}.sound-label{position:relative;display:flex;align-items:center;justify-content:space-between;font-size:14px;cursor:pointer;gap:12px}.sound-label>span:first-child{display:flex;align-items:center;gap:9px}.sound-label svg{width:19px;height:19px;color:var(--muted)}.sound-label input{position:absolute;opacity:0;right:0;width:38px;height:24px;margin:0}.switch{width:38px;height:23px;background:#354e65;border-radius:20px;flex-shrink:0}.switch:before{content:"";display:block;width:17px;height:17px;border-radius:50%;background:#052233;margin:3px;transition:transform .2s}.sound-label input:checked+.switch{background:var(--accent)}.sound-label input:checked+.switch:before{transform:translateX(15px)}.sound-label input:focus-visible+.switch{outline:2px solid var(--accent);outline-offset:4px}.small-note{font-size:12px;color:var(--muted);line-height:1.8;margin:17px 0 0}.stopwatch-copy{font-size:16px;line-height:1.9;color:var(--muted);margin:0 0 30px}.limit{border-top:1px solid var(--line);padding-top:20px;display:flex;justify-content:space-between;gap:10px}.limit span{font-size:14px;color:var(--muted)}.limit strong{font-family:monospace;font-size:20px;font-weight:400;color:var(--accent)}.timer-panel{padding:25px 32px 23px;min-width:0;position:relative;background:radial-gradient(ellipse at 50% 40%,#14394d 0,transparent 65%)}.timer-topline{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted)}.status{display:flex;align-items:center;gap:7px;font-size:13px}.status:before{content:"";width:6px;height:6px;border-radius:50%;background:#758fa6}.status.running{color:var(--accent)}.status.running:before,.status.done:before{background:var(--accent)}.status.done{color:var(--accent)}.status.paused{color:#e6c48f}.status.paused:before{background:#e6c48f}.dial-wrap{position:relative;width:min(100%,414px);aspect-ratio:1;margin:12px auto 8px}.dial{width:100%;height:100%;stroke-width:2}.dial-track{stroke:#28465e}.dial-progress{stroke:var(--accent);stroke-width:4;stroke-dasharray:1294.337;stroke-dashoffset:0;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset .2s linear}.dial-inner{stroke:#38627c;stroke-width:1;stroke-dasharray:1 13;opacity:.6}.timer-face{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center}.timer-face>p:first-child{font-size:14px;color:var(--muted);letter-spacing:3px;margin:0 0 22px}.digits,.digit-labels{display:grid;grid-template-columns:1.45fr .24fr 1fr .24fr 1fr;width:85%;align-items:center;text-align:center;gap:0}.digits{font-size:clamp(34px,4.5vw,57px);font-family:"SFMono-Regular",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;font-weight:400;line-height:1.15;letter-spacing:-2px}.digits b{font-size:.65em;color:#578caf;font-weight:400;transform:translateY(-3px)}.digits span:first-child{padding-left:6px}.digit-labels{font-size:12px;color:#7f9bb5;margin-top:13px;letter-spacing:2px}.timer-detail{font-size:13px;color:var(--accent);margin:26px 0 0;min-height:19px}.actions{display:flex;justify-content:center;gap:12px;align-items:center;margin:2px auto 0}.actions button{height:51px;border-radius:11px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:16px}.reset-button{border:1px solid #29485e;color:var(--text);background:transparent;padding:0 20px}.reset-button svg{height:18px;width:18px}.reset-button:hover{background:#12344a}.primary-button{background:var(--accent);color:#041b2b;border:1px solid var(--accent);min-width:195px;padding:0 30px;font-weight:600}.primary-button:hover{background:#a8eeff}.primary-button svg{width:19px;height:19px;fill:currentColor;stroke-width:1.5}.keyboard-hint{color:#7494ac;text-align:center;font-size:12px;margin:19px 0 0}kbd{font-family:inherit;font-size:11px;border:1px solid #31566f;padding:2px 5px;border-radius:4px;margin-right:4px}footer{display:flex;justify-content:space-between;color:#748fa6;padding:25px 0 32px;font-size:12px;letter-spacing:.5px}footer span:last-child{letter-spacing:1px}footer i{font-style:normal;margin:0 6px;color:#547b98}.completion{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);width:min(440px,calc(100% - 32px));background:#b6eaff;color:#1e2c19;padding:20px;border-radius:16px;box-shadow:0 15px 60px #0008;display:flex;gap:16px;align-items:center;z-index:5}.completion-symbol{font-size:25px}.completion strong{font-size:17px}.completion p{font-size:14px;margin:5px 0 0}.completion button{margin-left:auto;border:0;background:none;color:inherit;font-size:25px;padding:5px}.app:fullscreen{background:var(--bg);overflow:auto}
+@media(min-width:1500px){.app{padding-top:15px}.intro{padding-top:50px;padding-bottom:42px}}
+@media(max-width:900px){.app{padding:0 28px}.workspace{grid-template-columns:300px 1fr}.settings{padding:27px 22px}.timer-panel{padding:25px 18px}.digits{font-size:clamp(28px,4.5vw,45px)}.primary-button{min-width:160px;padding:0 20px}.reset-button{padding:0 13px}.dial-wrap{margin-top:30px;margin-bottom:27px}.intro{padding:30px 0}h1{font-size:28px}.settings-bottom{padding-top:38px}}
+@media(max-width:680px){.app{padding:0 20px}.topbar{height:79px}.brand strong{font-size:21px}.brand strong span{font-size:13px;margin-left:8px}.brand-mark{font-size:33px}.range-label{display:none}.intro{padding:28px 0 24px}.eyebrow{font-size:10px;letter-spacing:1.8px}h1{font-size:26px;margin-top:11px}.workspace{display:flex;flex-direction:column;border-radius:19px}.settings{border-right:0;border-bottom:1px solid var(--line);padding:20px 21px 22px}.mode-tabs{margin-bottom:23px}.mode-tabs button{padding:10px 0}.section-heading{margin-bottom:13px}.duration-inputs input{padding:10px 0;font-size:26px}.duration-inputs{grid-template-columns:1fr 12px 1fr 12px 1fr;gap:5px}.duration-inputs label>span{margin-top:7px;font-size:12px}.input-colon{padding-top:8px}.input-error{margin:6px 0;min-height:0}.input-error:empty{display:none}.presets{grid-template-columns:repeat(4,1fr);margin-top:18px;gap:7px}.presets button{font-size:12px;padding:9px 0}.settings-bottom{padding-top:22px}.small-note{margin:9px 0 0;font-size:12px;line-height:1.6}.sound-label{font-size:13px}.timer-panel{padding:20px 16px}.dial-wrap{max-width:340px;margin:12px auto 11px}.digits{font-size:clamp(28px,8.5vw,47px)}.timer-face>p:first-child{margin-bottom:19px;font-size:13px}.timer-detail{margin-top:22px}.actions{gap:10px}.actions button{height:48px;font-size:15px}.primary-button{min-width:180px}.reset-button{padding:0 18px}.keyboard-hint{display:none}footer{font-size:11px;padding-top:20px;gap:15px;line-height:1.6}.limit{margin-bottom:10px}.stopwatch-copy{margin-bottom:20px}.completion{bottom:16px}.digit-labels{font-size:11px}}
+@media(max-width:350px){.app{padding:0 12px}.settings{padding-left:16px;padding-right:16px}.primary-button{min-width:155px}.actions{gap:8px}.reset-button{padding:0 12px}.timer-detail{font-size:12px}.timer-face>p:first-child{margin-bottom:14px}}
+@media(prefers-reduced-motion:reduce){*,*:before{transition:none!important}}
+/* Keep the timer and its primary action visible first on small screens. */
+@media(max-width:680px){.settings{display:contents}.mode-tabs{order:-2;margin:20px 20px 0}.timer-panel{order:-1;border-bottom:1px solid var(--line);padding-top:20px}.timer-topline{padding:0 4px}.dial-wrap{margin-top:8px}.settings-bottom{padding:4px 21px 22px}#duration-settings,#stopwatch-settings{padding:23px 21px}.intro{padding:23px 0 21px}}
+
+/* Electric instrument panel and sculpted numeric display. */
+body { background-image: radial-gradient(ellipse at 75% 30%, #14315255, transparent 60%), linear-gradient(#3c779909 1px, transparent 1px), linear-gradient(90deg, #3c779909 1px, transparent 1px); background-size: auto, 48px 48px, 48px 48px; }
+.topbar { border-bottom-color: #264459; }
+.brand-mark { text-shadow: 0 0 16px #57dbff66; }
+.workspace { border-radius: 16px; border-color: #2c4e69; box-shadow: 0 22px 70px #0005, inset 0 1px #7bdfff14; }
+.settings { background: linear-gradient(145deg, #11233888, #09142244); }
+.mode-tabs { border-radius: 6px; box-shadow: inset 0 2px 8px #0007; }
+.mode-tabs button { border-radius: 3px; }
+.mode-tabs button[aria-selected=true] { box-shadow: inset 0 1px #85d8ff40, 0 2px 5px #0005; color: #a7ebff; }
+.duration-inputs input { border-radius: 5px; box-shadow: inset 0 3px 9px #0006, 0 1px #70cfff14; }
+.presets button { border-radius: 4px; }
+.timer-panel { --digit-top: #e3fcff; --digit-mid: #7ae7ff; --digit-low: #209ac7; --digit-depth: #075279; --digit-glow: #38cdff66; --digit-bevel: #eaffff; --timer-signal: #57dbff; background: radial-gradient(ellipse at 50% 44%, #12426477, #0a172877 63%), linear-gradient(135deg, #1b45691c, transparent); }
+.timer-panel::before,.timer-panel::after { content: ''; position: absolute; width: 20px; height: 20px; pointer-events: none; border-color: #57dbff88; border-style: solid; }
+.timer-panel::before { left: 15px; top: 15px; border-width: 1px 0 0 1px; }
+.timer-panel::after { right: 15px; bottom: 15px; border-width: 0 1px 1px 0; }
+.timer-topline { padding: 0 8px; }
+.dial-track { stroke: #29516a; stroke-width: 1; }
+.dial-progress { stroke: var(--timer-signal); stroke-width: 3; filter: drop-shadow(0 0 4px var(--digit-glow)); }
+.dial-inner { stroke: #5f99b9; stroke-width: 4; stroke-dasharray: 1 13; opacity: .5; }
+.timer-face>p:first-child { letter-spacing: 5px; color: #99b9cc; margin-bottom: 20px; }
+.digits,.digit-labels { width: 88%; grid-template-columns: 1fr .17fr 1fr .17fr 1fr; }
+.digits { color: var(--timer-signal); align-items: center; font-size: 0; letter-spacing: 0; isolation: isolate; }
+.digits.has-three-hours,.digits.has-three-hours+.digit-labels { grid-template-columns: 1.5fr .17fr 1fr .17fr 1fr; }
+.digits>span { position: relative; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 0; filter: drop-shadow(0 0 8px var(--digit-glow)); }
+.digits>span:first-child { padding-left: 0; }
+.digit-value { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.tech-digit { width: 50%; height: auto; min-width: 0; overflow: visible; stroke: none; fill: none; flex-shrink: 1; }
+.has-three-hours #display-hours .tech-digit { width: 33.333333%; }
+.metal-top { stop-color: var(--digit-top); }.metal-mid { stop-color: var(--digit-mid); }.metal-low { stop-color: var(--digit-low); }
+.segment-depth { fill: var(--digit-depth); stroke: #0007; stroke-width: .7; }
+.segment-face { stroke: #051d3566; stroke-width: .6; }
+.segment-bevel { fill: none; stroke: var(--digit-bevel); stroke-opacity: .52; stroke-width: .8; stroke-linejoin: miter; }
+.digits b { position: relative; width: 100%; height: 38px; font-size: 0; transform: skewX(-6deg); color: var(--timer-signal); filter: drop-shadow(0 0 6px var(--digit-glow)); }
+.digits b::before,.digits b::after { content: ''; position: absolute; left: 50%; width: 5px; height: 5px; background: currentColor; box-shadow: 0 2px 0 var(--digit-depth); transform: translateX(-50%) rotate(45deg); }
+.digits b::before { top: 5px; }.digits b::after { bottom: 5px; }
+.digit-labels { color: #8facbf; margin-top: 12px; }
+.timer-detail { color: var(--timer-signal); letter-spacing: 1px; }
+.status.running,.status.done { color: var(--timer-signal); }
+.status.running::before,.status.done::before { background: var(--timer-signal); box-shadow: 0 0 8px var(--digit-glow); }
+.primary-button { border-radius: 5px!important; background: linear-gradient(160deg, #b2f2ff 0%, #57dbff 48%, #2eabd8 49%, #49c9ed 100%); box-shadow: inset 0 1px 0 #fff9, 0 4px 0 #116384, 0 5px 20px #27c2ff20; border-color: #93e8ff; }
+.primary-button:hover { background: linear-gradient(160deg, #ddfaff, #6be3ff 48%, #38b4de 49%, #62dcff); }
+.reset-button { border-radius: 5px!important; background: linear-gradient(#142c40, #0b1929); box-shadow: inset 0 1px #8bdfff1c, 0 3px 0 #040b16; }
+.timer-panel.is-urgent { --digit-top: #ffe5e7; --digit-mid: #ff6b78; --digit-low: #d72442; --digit-depth: #761d37; --digit-glow: #ff354c77; --digit-bevel: #ffe2e6; --timer-signal: #ff5166; background: radial-gradient(ellipse at 50% 44%, #661c344d, #0a172877 65%); }
+.is-urgent .dial-inner { stroke: #bb4c61; }.is-urgent .dial-track { stroke: #6a3046; }
+.is-urgent .timer-face>p:first-child { color: #ff9ba8; }.is-urgent::before,.is-urgent::after { border-color: #ff516688; }
+@media(max-width:900px) and (min-width:681px) { .digits,.digit-labels { width: 90%; }.timer-face>p:first-child { margin-bottom: 14px; }.timer-detail { margin-top: 17px; } }
+@media(max-width:680px) { .workspace { border-radius: 12px; }.settings { background: none; }.timer-panel::before,.timer-panel::after { width: 12px; height: 12px; }.timer-panel::before { top: 14px; left: 12px; }.timer-panel::after { right: 12px; bottom: 12px; }.timer-topline { padding: 0 6px; }.digits,.digit-labels { width: 85%; }.timer-face>p:first-child { margin-bottom: 14px; }.timer-detail { margin-top: 18px; }.digits b { height: 28px; }.digits b::before,.digits b::after { width: 4px; height: 4px; } }
+
+/* Deep-space geometry stays behind every interactive surface. */
+body { min-height: 100vh; isolation: isolate; background: #040b18; }
+.app { position: relative; z-index: 1; }
+.tech-background { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: radial-gradient(ellipse at 13% 23%, #087eac40, transparent 43%), radial-gradient(ellipse at 87% 57%, #263ea54d, transparent 50%), linear-gradient(155deg, #030914 5%, #07172b 47%, #030918 100%); }
+.space-grid { position: absolute; inset: 0; background-image: linear-gradient(#58caff14 1px, transparent 1px), linear-gradient(90deg, #58caff14 1px, transparent 1px), radial-gradient(circle, #8fe7ff88 1px, transparent 1.8px); background-size: 76px 76px, 76px 76px, 152px 152px; mask-image: linear-gradient(110deg, #000, #0005 45%, #000b); opacity: .75; }
+.space-grid::before { content: ''; position: absolute; width: 50vw; height: 1px; left: -8vw; top: 28%; transform: rotate(-32deg); background: linear-gradient(90deg, transparent, #44ceff99, transparent); box-shadow: 0 0 15px #2ca7ff88; }
+.space-grid::after { content: ''; position: absolute; width: 55vw; height: 1px; right: -5vw; top: 17%; transform: rotate(32deg); background: linear-gradient(90deg, transparent, #387eff77, transparent); }
+.orbital-rings { position: absolute; width: 760px; height: 760px; right: -340px; top: -90px; border: 1px solid #49c9ff35; border-radius: 50%; box-shadow: 0 0 0 28px #37baff08, 0 0 0 29px #49c9ff28, 0 0 0 80px #1b8dcb08, 0 0 0 81px #49c9ff20, inset 0 0 90px #158cdb0b; transform: rotate(-20deg); }
+.orbital-rings::before { content: ''; position: absolute; inset: 56px; border-radius: 50%; border: 1px dashed #70dfff2b; }
+.orbital-rings::after { content: ''; position: absolute; inset: -46px; border-radius: 50%; border: 2px solid transparent; border-top-color: #51caff55; border-left-color: #51caff22; filter: drop-shadow(0 0 8px #36bbff44); }
+.perspective-grid { position: absolute; left: -50%; width: 200%; top: 69%; height: 90%; transform-origin: center top; transform: perspective(500px) rotateX(62deg); background-image: linear-gradient(#47bcff40 1px, transparent 1px), linear-gradient(90deg, #47bcff40 1px, transparent 1px); background-size: 74px 58px; mask-image: linear-gradient(transparent, #000c 14%, #0007 70%, transparent); }
+.light-streams { position: absolute; inset: 0; overflow: hidden; opacity: .65; }
+.light-streams i { position: absolute; width: 1px; height: 190px; top: -230px; left: 8%; background: linear-gradient(transparent, #4dcfff55 70%, #9aefffbb); box-shadow: 0 0 12px #35c6ff66; animation: data-flow 22s linear infinite; }
+.light-streams i:nth-child(2) { left: 27%; animation-delay: -15s; animation-duration: 28s; height: 140px; opacity: .4; }
+.light-streams i:nth-child(3) { left: 83%; animation-delay: -7s; animation-duration: 25s; height: 230px; }
+.light-streams i:nth-child(4) { left: 95%; animation-delay: -19s; animation-duration: 32s; opacity: .5; }
+.horizon-glow { position: absolute; left: 4%; right: 4%; height: 1px; top: 69%; background: linear-gradient(90deg, transparent, #32bbff66, #72dcff99, #32bbff66, transparent); box-shadow: 0 0 26px 4px #20a4ff26; }
+@keyframes data-flow { from { transform: translate3d(0, -20px, 0); } to { transform: translate3d(0, calc(100vh + 460px), 0); } }
+.workspace { background: #071425d9; border-color: #417399b3; box-shadow: 0 24px 70px #0008, 0 0 38px #117fb31c, inset 0 1px #a5eaff26; }
+.settings { background: linear-gradient(145deg, #173b5677, #081421aa); }
+.timer-panel { isolation: isolate; background: radial-gradient(ellipse at 50% 45%, #103b59cc 0%, #0a1c34aa 43%, #06122388 85%); }
+.panel-grid { position: absolute; inset: 0; overflow: hidden; z-index: -1; pointer-events: none; background-image: linear-gradient(#3aa5d713 1px, transparent 1px), linear-gradient(90deg, #3aa5d713 1px, transparent 1px); background-size: 36px 36px; mask-image: radial-gradient(ellipse at 50% 43%, transparent 24%, #000 75%); }
+.panel-grid::before { content: ''; position: absolute; width: 92%; height: 92%; left: 4%; top: 2%; border: 1px solid #4eccff20; border-radius: 50%; transform: scaleY(.86); box-shadow: 0 0 0 16px #168cff06, 0 0 0 17px #55caff10; }
+.panel-grid::after { content: ''; position: absolute; inset: 13% 7%; border-top: 1px solid #43caff33; border-bottom: 1px solid #43caff22; clip-path: polygon(0 0, 30% 0, 30% 3%, 70% 3%, 70% 0, 100% 0, 100% 100%, 70% 100%, 70% 97%, 30% 97%, 30% 100%, 0 100%); }
+.timer-panel.is-urgent { background: radial-gradient(ellipse at 50% 44%, #661c3473, #0a1728aa 65%); }
+.is-urgent .panel-grid { opacity: .55; }
+@media(max-width:680px) {
+  .orbital-rings { width: 550px; height: 550px; right: -390px; top: -110px; opacity: .8; }
+  .space-grid { background-size: 54px 54px, 54px 54px, 108px 108px; opacity: .7; }
+  .perspective-grid { top: 72%; background-size: 52px 42px; }
+  .horizon-glow { top: 72%; }
+  .workspace { background: #09172bcc; }
+  .settings { background: none; }
+  .panel-grid { background-size: 28px 28px; }
+  .light-streams { opacity: .35; }
+  .light-streams i:nth-child(2),.light-streams i:nth-child(4) { display: none; }
+}
+@media(prefers-reduced-motion:reduce) { .tech-background *, .tech-background *::before, .tech-background *::after { animation: none!important; }.light-streams i { transform: translateY(42vh); } }
+
+/* A vivid spectral atmosphere, with a calm dark center for the clock. */
+body { background: #101434; }
+.tech-background { background: radial-gradient(ellipse at 0% 12%, #00bdbfa1, transparent 48%), radial-gradient(ellipse at 94% 3%, #9a35eea8, transparent 49%), radial-gradient(ellipse at 100% 73%, #ef368b88, transparent 43%), radial-gradient(ellipse at 4% 91%, #09bb84a1, transparent 44%), radial-gradient(ellipse at 69% 108%, #ffa53199, transparent 44%), linear-gradient(145deg, #0a2450, #242254 52%, #401c47); }
+.aurora { position: absolute; pointer-events: none; width: 115%; height: 38%; left: -8%; filter: blur(38px); opacity: .7; transform-origin: center; animation: aurora-drift 24s ease-in-out infinite alternate; }
+.aurora-cool { top: -12%; background: linear-gradient(105deg, transparent 3%, #00ffd0 21%, #16bfff 42%, #735dff 63%, #f34fd8 81%, transparent); transform: rotate(-14deg); }
+.aurora-warm { bottom: -16%; background: linear-gradient(95deg, #16efbf 5%, #22b8ff 24%, #9873ff 44%, #ff53b4 65%, #ffae42 83%, #ffee92); animation-delay: -9s; transform: rotate(12deg); }
+@keyframes aurora-drift { from { translate: -3% 0; scale: 1; } to { translate: 5% 7%; scale: 1.12; } }
+.space-grid { opacity: .9; background-image: linear-gradient(#a7e3ff20 1px, transparent 1px), linear-gradient(90deg, #baaaff1c 1px, transparent 1px), radial-gradient(circle, #dcfaffcc 1px, transparent 1.8px); }
+.space-grid::before { background: linear-gradient(90deg, transparent, #2debd8, #879bff99, transparent); box-shadow: 0 0 18px #00ffc388; }
+.space-grid::after { background: linear-gradient(90deg, transparent, #c481ffbb, #ffa3e3cc, transparent); }
+.orbital-rings { border-color: #f9a0ea66; box-shadow: 0 0 0 28px #8a55ff12, 0 0 0 29px #c08aff66, 0 0 0 80px #ed62c30a, 0 0 0 81px #ff96ce55, inset 0 0 90px #c361ff22; }
+.orbital-rings::before { border-color: #9dcdff66; }.orbital-rings::after { border-top-color: #ffd790aa; border-left-color: #fd79d477; filter: drop-shadow(0 0 8px #fb6ecb77); }
+.perspective-grid { background-image: linear-gradient(#e0a2ff66 1px, transparent 1px), linear-gradient(90deg, #59ffe666 1px, transparent 1px); }
+.horizon-glow { height: 2px; background: linear-gradient(90deg, transparent, #42ffcf, #47cbff, #a585ff, #ff66bb, #ffd37a, transparent); box-shadow: 0 0 25px 5px #b055ff66; }
+.light-streams { opacity: .85; }
+.light-streams i { width: 2px; background: linear-gradient(transparent, #32fbe677 65%, #affff5); box-shadow: 0 0 14px #38f9d877; }
+.light-streams i:nth-child(2) { background: linear-gradient(transparent, #b781ff77 65%, #f3c8ff); box-shadow: 0 0 14px #be6aff88; opacity: .75; }
+.light-streams i:nth-child(3) { background: linear-gradient(transparent, #ff58bd77 65%, #ffd1ee); box-shadow: 0 0 14px #fc51b988; }
+.light-streams i:nth-child(4) { background: linear-gradient(transparent, #ffcb5677 65%, #fff1c4); box-shadow: 0 0 14px #ffd65988; opacity: .75; }
+.topbar { border-image: linear-gradient(90deg, #67f7dd99, #77b8ff66, #c38eff88, #fb9bc077) 1; }
+h1 span { color: #a4ecff; text-shadow: 0 0 22px #93a5ff55; }
+.eyebrow,.range-label { color: #aecbdf; }
+.workspace { border: 1px solid transparent; background: linear-gradient(125deg, #112944e8, #201b3fe8) padding-box, linear-gradient(130deg, #4eefd5, #70bcff 26%, #b78bff 55%, #f583c4 78%, #ffcb78) border-box; box-shadow: 0 24px 70px #02031888, -12px 0 48px #11cdba1c, 12px 0 48px #da59fc20; }
+.settings { background: linear-gradient(150deg, #174c5573, #1d245b4d 55%, #5531544d); }
+.timer-panel { background: radial-gradient(ellipse at 50% 44%, #0a172ff2 0%, #101b35da 31%, transparent 70%), radial-gradient(ellipse at 0% 10%, #00e6c84d, transparent 65%), radial-gradient(ellipse at 100% 0%, #a65cff66, transparent 65%), radial-gradient(ellipse at 100% 100%, #ff6baa5e, transparent 58%), radial-gradient(ellipse at 0% 100%, #eac26440, transparent 58%); }
+.panel-grid { background-image: linear-gradient(#69dcc526 1px, transparent 1px), linear-gradient(90deg, #cd9bff26 1px, transparent 1px); }
+.panel-grid::before { border-top-color: #6ae9f59c; border-right-color: #d6a0ffa1; border-bottom-color: #f4b9a777; border-left-color: #77f4c477; box-shadow: 0 0 0 16px #7569ff0a, 0 0 0 17px #c9aaff20; }
+.panel-grid::after { border-top-color: #b991ff66; border-bottom-color: #ffd58855; }
+.timer-panel::before { border-color: #79fbd5bb; }.timer-panel::after { border-color: #edb1ffbb; }
+.timer-panel.is-urgent { background: radial-gradient(ellipse at 50% 44%, #351627f5, #10152edb 65%), linear-gradient(135deg, #15434b, #4c2455); }
+.is-urgent .panel-grid { opacity: .3; }
+.is-urgent::before,.is-urgent::after { border-color: #ff687a99; }
+footer { color: #b1c8dc; }
+@media(max-width:680px) {
+  .aurora { height: 42%; filter: blur(26px); opacity: .6; }
+  .aurora-cool { top: -8%; }.aurora-warm { bottom: -10%; }
+  .workspace { background: linear-gradient(140deg, #112943e8, #241a3de8) padding-box, linear-gradient(145deg, #56f3cb, #7cb8ff 30%, #bd8eff 56%, #fd96c4 81%, #ffd182) border-box; }
+  .settings { background: none; }
+  .light-streams { opacity: .55; }
+  .orbital-rings { opacity: 1; }
+}
+@media(prefers-reduced-motion:reduce) { .aurora { animation: none!important; } }
+
+/* Music follows the timer; its controls remain separate from the finish chime. */
+.music-controls { padding-bottom: 19px; margin-bottom: 20px; border-bottom: 1px solid #88b3e52b; }
+.music-track { font-size: 13px; color: #d5eaff; margin: 12px 0 14px; }
+.music-track span { color: #a9b9cc; }
+.music-volume { display: flex; gap: 12px; align-items: center; font-size: 12px; color: #b9cbe0; }
+.music-volume label { flex-shrink: 0; }
+.music-volume input { min-width: 0; width: 100%; height: 22px; margin: 0; accent-color: #87e5ff; cursor: pointer; }
+.music-volume output { min-width: 34px; text-align: right; font-variant-numeric: tabular-nums; }
+.music-status { margin: 10px 0 0; min-height: 20px; font-size: 12px; color: #a9bdd3; line-height: 1.6; }
+.music-status.is-playing { color: #9cf3d9; }
+@media(max-width:680px) { .music-controls { padding-bottom: 16px; margin-bottom: 17px; }.music-volume input { height: 28px; } }
+
+</style>
+  
+  <script>
+document.addEventListener("DOMContentLoaded",()=>{
+(() => {
+  'use strict';
+  // Original 32-beat electronic composition. Render once, then loop on the audio
+  // clock so background-tab throttling cannot interrupt a note scheduler.
+  function compose(context) {
+    const rate = 22050, beat = 60 / 96, length = 32 * beat;
+    const buffer = context.createBuffer(1, Math.round(rate * length), rate);
+    const data = buffer.getChannelData(0), tau = Math.PI * 2;
+    const hz = midi => 440 * 2 ** ((midi - 69) / 12);
+    function note(midi, start, duration, volume, kind = 'pluck') {
+      const frequency = hz(midi), offset = Math.round(start * rate), samples = Math.round(duration * rate);
+      for (let i = 0; i < samples; i++) {
+        const t = i / rate, phase = tau * frequency * t;
+        let wave, envelope;
+        if (kind === 'pad') {
+          envelope = Math.min(1, t / .7) * Math.min(1, (duration - t) / 1.1);
+          wave = Math.sin(phase) * .7 + Math.sin(phase * 2) * .18 + Math.sin(phase * 1.002) * .12;
+        } else if (kind === 'bass') {
+          envelope = Math.min(1, t / .025) * Math.exp(-t * 2.6) * Math.min(1, (duration - t) / .1);
+          wave = Math.sin(phase) * .9 + Math.sin(phase * 2) * .1;
+        } else {
+          envelope = Math.min(1, t / .012) * Math.exp(-t * 3.8) * Math.min(1, (duration - t) / .08);
+          wave = Math.sin(phase) * .72 + Math.sin(phase * 2) * .21 + Math.sin(phase * 3) * .07;
+        }
+        data[(offset + i) % data.length] += wave * envelope * volume;
+      }
+    }
+    const chords = [[57, 60, 64, 71], [53, 57, 60, 64], [48, 55, 59, 64], [55, 59, 62, 69]];
+    const melodies = [[76, 79, 83, 79, 76, 74, 72, 71], [72, 76, 79, 76, 74, 72, 69, 72], [71, 74, 76, 79, 83, 79, 76, 74], [74, 78, 81, 78, 76, 74, 71, 74]];
+    chords.forEach((chord, bar) => {
+      const base = bar * 8 * beat;
+      chord.forEach(n => note(n, base, 8 * beat + .65, .075, 'pad'));
+      for (let step = 0; step < 16; step++) {
+        const n = chord[[0, 2, 1, 3, 2, 1, 3, 2][step % 8]] + 12;
+        note(n, base + step * beat / 2, .95, step % 2 ? .095 : .13);
+      }
+      melodies[bar].forEach((n, step) => {
+        note(n, base + step * beat, 1.1, .13);
+        note(n, base + step * beat + beat * .75, .8, .032);
+      });
+      for (let step = 0; step < 8; step += 2) note(chord[0] - 12, base + step * beat, 1.25, .2, 'bass');
+    });
+    // Gentle kick and short high-frequency ticks, kept beneath the melody.
+    let seed = 173;
+    for (let step = 0; step < 32; step++) {
+      const offset = Math.round(step * beat * rate);
+      if (step % 2 === 0) for (let i = 0; i < rate * .28; i++) {
+        const t = i / rate;
+        data[(offset + i) % data.length] += Math.sin(tau * (48 * t + 1.9 * (1 - Math.exp(-t * 26)))) * Math.exp(-t * 19) * Math.min(1, t / .006) * .12;
+      }
+      for (let i = 0; i < rate * .05; i++) {
+        seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+        const t = i / rate;
+        data[(offset + Math.round(beat / 2 * rate) + i) % data.length] += (seed / 4294967296 * 2 - 1) * Math.exp(-t * 110) * Math.min(1, t / .004) * .026;
+      }
+    }
+    let peak = 0;
+    for (let i = 0; i < data.length; i++) peak = Math.max(peak, Math.abs(data[i]));
+    const scale = peak ? .72 / peak : 1;
+    for (let i = 0; i < data.length; i++) data[i] *= scale;
+    return buffer;
+  }
+  class TimerMusic {
+    constructor(context, onChange = () => {}) {
+      this.context = context;
+      this.onChange = onChange;
+      this.buffer = compose(context);
+      this.output = context.createGain();
+      this.output.gain.value = 0;
+      this.output.connect(context.destination);
+      this.source = null;
+      this.voice = null;
+      this.offset = 0;
+      this.startedAt = 0;
+    }
+    get playing() { return !!this.source && this.context.state === 'running'; }
+    setVolume(percent) {
+      const value = Math.max(0, Math.min(100, Number(percent) || 0)) / 100;
+      this.output.gain.setTargetAtTime(value ** 1.4 * .7, this.context.currentTime, .04);
+    }
+    start(remainingSeconds) {
+      if (this.source || remainingSeconds <= 0) return;
+      const context = this.context, now = context.currentTime;
+      const source = context.createBufferSource(), voice = context.createGain();
+      source.buffer = this.buffer;
+      source.loop = true;
+      source.connect(voice); voice.connect(this.output);
+      voice.gain.setValueAtTime(0, now);
+      voice.gain.linearRampToValueAtTime(1, now + .06);
+      this.source = source; this.voice = voice; this.startedAt = now;
+      source.onended = () => {
+        source.disconnect(); voice.disconnect();
+        if (this.source === source) { this.source = null; this.voice = null; this.offset = 0; this.onChange(); }
+      };
+      source.start(now, this.offset % this.buffer.duration);
+      if (Number.isFinite(remainingSeconds)) {
+        const end = now + remainingSeconds;
+        voice.gain.setValueAtTime(1, Math.max(now + .06, end - .08));
+        voice.gain.linearRampToValueAtTime(0, Math.max(now + .06, end));
+        source.stop(end);
+      }
+      this.onChange();
+    }
+    pause(rewind = false) {
+      const source = this.source, voice = this.voice, now = this.context.currentTime;
+      if (source) {
+        this.offset = (this.offset + Math.max(0, now - this.startedAt)) % this.buffer.duration;
+        this.source = null; this.voice = null;
+        voice.gain.cancelScheduledValues(now);
+        voice.gain.setValueAtTime(voice.gain.value, now);
+        voice.gain.linearRampToValueAtTime(0, now + .025);
+        try { source.stop(now + .03); } catch (_) {}
+      }
+      if (rewind) this.offset = 0;
+      this.onChange();
+    }
+  }
+  window.TimerMusic = TimerMusic;
+})();
+
+(() => {
+  'use strict';
+  const MAX = 100 * 60 * 60 * 1000;
+  const $ = id => document.getElementById(id);
+  const fields = ['hours', 'minutes', 'seconds'].map($);
+  const tabs = [...document.querySelectorAll('[data-mode]')];
+  const presets = [...document.querySelectorAll('[data-seconds]')];
+  let mode = 'countdown', status = 'idle', duration = 25 * 60 * 1000;
+  let elapsed = 0, startedAt = 0, audio = null, valid = true;
+  let music = null, musicRevision = 0, musicIssue = ''; 
+  const elapsedNow = () => Math.min(mode === 'countdown' ? duration : MAX, elapsed + (status === 'running' ? Math.max(0, Date.now() - startedAt) : 0));
+  const parts = ms => { const s = Math.max(0, ms); return [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60]; };
+  const format = seconds => parts(seconds).map(v => String(v).padStart(2, '0')).join(':');
+  const human = ms => parts(Math.round(ms / 1000)).map((n, i) => n ? `${n} ${['小时', '分钟', '秒'][i]}` : '').filter(Boolean).join(' ') || '0 秒';
+  // Beveled, angular seven-segment glyphs; actual time remains accessible as text.
+  const segments = {
+    a: 'M14 5H43L50 11L43 17H14L7 11Z',
+    b: 'M46 19L52 13V44L46 50L40 44V25Z',
+    c: 'M46 58L52 64V92L46 98L40 92V64Z',
+    d: 'M14 94H38L45 100L38 106H9L3 100Z',
+    e: 'M6 58L12 64V89L6 95L0 89V64Z',
+    f: 'M6 17L12 23V44L6 50L0 44V23Z',
+    g: 'M13 48H30L26 53H45L49 57L40 62H23L27 57H9L4 53Z'
+  };
+  const digitSegments = ['abcdef', 'bc', 'abged', 'abgcd', 'fgbc', 'afgcd', 'afgecd', 'abc', 'abcdefg', 'abfgcd'];
+  function paintDigits(id, value) {
+    const target = $(id);
+    if (target.dataset.value === value) return;
+    target.dataset.value = value;
+    target.innerHTML = `<span class="digit-value">${value}</span>` + [...value].map((n, i) => {
+      const key = `${id}-${i}`;
+      const paths = [...digitSegments[Number(n)]].map(segment => `<path d="${segments[segment]}"/>`).join('');
+      return `<svg class="tech-digit" viewBox="-2 0 66 116" aria-hidden="true" focusable="false"><defs><linearGradient id="metal-${key}" x1="0" y1="0" x2="0.65" y2="1"><stop class="metal-top" offset="0"/><stop class="metal-mid" offset=".42"/><stop class="metal-low" offset=".5"/><stop class="metal-mid" offset=".78"/><stop class="metal-top" offset="1"/></linearGradient><mask id="cut-${key}" x="-5" y="0" width="75" height="120" maskUnits="userSpaceOnUse"><rect x="-5" y="0" width="75" height="120" fill="white"/><path d="M-4 65L29 45L22 55L60 33" fill="none" stroke="black" stroke-width="2.1"/></mask></defs><g transform="translate(10 0) skewX(-6)"><g class="segment-depth" transform="translate(0 4)">${paths}</g><g mask="url(#cut-${key})"><g class="segment-face" fill="url(#metal-${key})">${paths}</g><g class="segment-bevel">${paths}</g></g></g></svg>`;
+    }).join('');
+  }
+  function message(text) { $('input-error').textContent = text; }
+  function readDuration() {
+    const values = fields.map(el => el.value === '' ? 0 : Number(el.value));
+    valid = values.every(Number.isInteger) && values.every(v => v >= 0) && values[0] <= 100 && values[1] <= 59 && values[2] <= 59;
+    const total = (values[0] * 3600 + values[1] * 60 + values[2]) * 1000;
+    valid = valid && total <= MAX;
+    if (!valid) message('请输入 0–100 小时；分钟、秒为 0–59，合计不超过 100 小时。');
+    else { duration = total; message(total === 0 ? '设置至少 1 秒，即可开始倒计时。' : ''); }
+    fields.forEach(el => el.setAttribute('aria-invalid', String(!valid)));
+    presets.forEach(el => el.classList.toggle('selected', valid && Number(el.dataset.seconds) * 1000 === duration));
+    if (status === 'done') { status = 'idle'; elapsed = 0; $('completion').hidden = true; }
+    render();
+    return valid;
+  }
+  function render() {
+    const spent = elapsedNow();
+    const seconds = mode === 'countdown' ? Math.ceil(Math.max(0, duration - spent) / 1000) : Math.floor(spent / 1000);
+    const nums = parts(seconds);
+    const urgent = mode === 'countdown' && status !== 'idle' && seconds <= 10;
+    $('timer-panel').classList.toggle('is-urgent', urgent);
+    $('digits').classList.toggle('has-three-hours', nums[0] >= 100);
+    ['display-hours', 'display-minutes', 'display-seconds'].forEach((id, i) => paintDigits(id, String(nums[i]).padStart(2, '0')));
+    $('digits').setAttribute('aria-label', `${mode === 'countdown' ? '剩余' : '已计时'} ${nums[0]} 小时 ${nums[1]} 分钟 ${nums[2]} 秒`);
+    const busy = status === 'running' || status === 'paused';
+    fields.forEach(el => el.disabled = busy);
+    presets.forEach(el => el.disabled = busy);
+    tabs.forEach(el => el.disabled = busy);
+    const statusText = { idle: '准备就绪', running: '计时中', paused: '已暂停', done: mode === 'countdown' ? '时间到' : '已达 100 小时' }[status];
+    $('status').textContent = statusText;
+    $('status').className = `status ${status}`;
+    $('start-label').textContent = { idle: '开始计时', running: '暂停计时', paused: '继续计时', done: '再来一次' }[status];
+    $('play-icon').innerHTML = status === 'running' ? '<path d="M8 5v14M16 5v14" stroke-width="4"/>' : '<path d="m8 5 11 7-11 7Z"/>';
+    $('start').disabled = mode === 'countdown' && (!valid || duration === 0);
+    $('timer-detail').textContent = status === 'done' ? (mode === 'countdown' ? '这一段时间，完成了。' : '已达到计时上限') : status === 'paused' ? '休息一下，随时继续' : urgent ? '最后 10 秒' : mode === 'countdown' ? `共 ${human(duration)}` : '从 0 开始 · 最长 100 小时';
+    const progress = mode === 'countdown' ? (duration ? 1 - spent / duration : 0) : spent / MAX;
+    $('dial-progress').style.strokeDashoffset = String(1294.337 * (1 - Math.max(0, Math.min(1, progress))));
+    const title = status === 'idle' ? '此刻 · 100 小时计时器' : `${format(seconds)} ${status === 'done' ? '· 时间到' : status === 'paused' ? '· 已暂停' : '· 此刻'}`;
+    if (document.title !== title) document.title = title;
+  }
+  function getAudio() {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      if (!audio) { audio = new Ctx(); audio.addEventListener('statechange', renderMusicStatus); }
+      return audio;
+    } catch (_) { return null; }
+  }
+  function unlockAudio() {
+    if (!$('sound').checked && !$('music').checked) return;
+    const context = getAudio();
+    if (context && context.state !== 'running') context.resume().catch(() => {});
+  }
+  function renderMusicStatus() {
+    let text = '开始计时后播放';
+    if (!$('music').checked) text = '音乐已关闭';
+    else if (musicIssue) text = musicIssue;
+    else if (Number($('music-volume').value) === 0) text = '音量为 0，已静音';
+    else if (status === 'paused') text = '已随计时暂停';
+    else if (status === 'running') text = music?.playing ? '正在播放 · 星际漫游' : '正在准备音乐…';
+    else if (status === 'done') text = '计时结束，音乐已停止';
+    if ($('music-status').textContent !== text) $('music-status').textContent = text;
+    $('music-status').classList.toggle('is-playing', !!(status === 'running' && music?.playing && $('music').checked && Number($('music-volume').value) > 0));
+  }
+  async function syncMusic() {
+    const revision = ++musicRevision;
+    if (status !== 'running' || !$('music').checked) {
+      music?.pause(status === 'idle' || status === 'done');
+      musicIssue = ''; renderMusicStatus(); return;
+    }
+    musicIssue = ''; renderMusicStatus();
+    try {
+      const context = getAudio();
+      if (!context || !window.TimerMusic) throw new Error('unsupported');
+      if (context.state !== 'running') await context.resume();
+      if (revision !== musicRevision || status !== 'running' || !$('music').checked) return;
+      if (context.state !== 'running') throw new Error('blocked');
+      const limit = mode === 'countdown' ? duration : MAX;
+      if (elapsedNow() >= limit) { tick(); return; }
+      music ||= new window.TimerMusic(context, renderMusicStatus);
+      music.setVolume($('music-volume').value);
+      // Compute after composition so music never outlives the timer deadline.
+      const remaining = (limit - elapsedNow()) / 1000;
+      if (remaining <= 0) { tick(); return; }
+      music.start(remaining);
+    } catch (_) {
+      if (revision === musicRevision) musicIssue = '音乐未能播放，请关闭后重新开启';
+    }
+    renderMusicStatus();
+  }
+  function chime() {
+    if (!$('sound').checked || !audio || audio.state !== 'running') return;
+    try {
+      [0, .28, .56].forEach((offset, i) => {
+        const osc = audio.createOscillator(), gain = audio.createGain(), t = audio.currentTime + offset;
+        osc.frequency.value = [660, 880, 1100][i]; osc.type = 'sine';
+        gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(.19, t + .02); gain.gain.exponentialRampToValueAtTime(.001, t + .45);
+        osc.connect(gain); gain.connect(audio.destination); osc.start(t); osc.stop(t + .5);
+      });
+    } catch (_) {}
+  }
+  function finish() {
+    if (status !== 'running') return;
+    elapsed = mode === 'countdown' ? duration : MAX; status = 'done';
+    $('completion-title').textContent = mode === 'countdown' ? '时间到' : '已达 100 小时';
+    $('completion-text').textContent = mode === 'countdown' ? '这一段时间，完成了。' : '本次计时已自动停止。';
+    $('completion').hidden = false; syncMusic(); chime(); render();
+  }
+  function tick() {
+    if (status === 'running' && elapsedNow() >= (mode === 'countdown' ? duration : MAX)) finish();
+    else render();
+  }
+  function startPause() {
+    if (status === 'running') { tick(); if (status !== 'running') return; elapsed = elapsedNow(); status = 'paused'; }
+    else {
+      if (mode === 'countdown' && (status === 'idle' || status === 'done') && (!readDuration() || duration === 0)) return;
+      if (status === 'done') elapsed = 0;
+      unlockAudio(); $('completion').hidden = true; startedAt = Date.now(); status = 'running';
+    }
+    syncMusic(); render();
+  }
+  function reset() { status = 'idle'; elapsed = 0; startedAt = 0; $('completion').hidden = true; syncMusic(); render(); }
+  function setMode(next) {
+    if (!['countdown', 'stopwatch'].includes(next)) throw new Error('无效的计时模式');
+    if (status === 'running' || status === 'paused') throw new Error('请先重置当前计时');
+    mode = next; reset();
+    tabs.forEach(el => { const active = el.dataset.mode === mode; el.setAttribute('aria-selected', String(active)); el.tabIndex = active ? 0 : -1; });
+    $('duration-settings').hidden = mode !== 'countdown'; $('stopwatch-settings').hidden = mode !== 'stopwatch';
+    $('timer-panel').setAttribute('aria-labelledby', `${mode}-tab`);
+    $('mode-label').textContent = mode === 'countdown' ? '倒计时' : '正计时';
+    $('timer-caption').textContent = mode === 'countdown' ? '剩余时间' : '已经过时间'; render();
+  }
+  tabs.forEach(el => { el.addEventListener('click', () => setMode(el.dataset.mode)); el.addEventListener('keydown', e => { if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) { e.preventDefault(); const next = e.key === 'Home' ? tabs[0] : e.key === 'End' ? tabs[1] : tabs.find(t => t !== el); setMode(next.dataset.mode); next.focus(); } }); });
+  fields.forEach(el => el.addEventListener('input', readDuration));
+  presets.forEach(el => el.addEventListener('click', () => { const nums = parts(Number(el.dataset.seconds)); fields.forEach((f, i) => f.value = nums[i]); readDuration(); }));
+  $('start').addEventListener('click', startPause); $('reset').addEventListener('click', reset);
+  $('dismiss').addEventListener('click', () => $('completion').hidden = true);
+  $('sound').addEventListener('change', unlockAudio);
+  $('music').addEventListener('change', () => { unlockAudio(); syncMusic(); });
+  $('music-volume').addEventListener('input', () => {
+    $('music-volume-value').textContent = `${$('music-volume').value}%`;
+    music?.setVolume($('music-volume').value);
+    renderMusicStatus();
+  });
+  window.addEventListener('pagehide', () => { ++musicRevision; music?.pause(); });
+  document.addEventListener('keydown', e => { if (e.code === 'Space' && !e.repeat && !e.altKey && !e.ctrlKey && !e.metaKey && !e.target.closest('input,button,a,textarea,select,[contenteditable]')) { e.preventDefault(); startPause(); } });
+  $('fullscreen').addEventListener('click', async () => { try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); } catch (_) { $('fullscreen').title = '当前浏览器不支持全屏'; } });
+  if (!document.documentElement.requestFullscreen) $('fullscreen').hidden = true;
+  document.addEventListener('fullscreenchange', () => { $('fullscreen').setAttribute('aria-label', document.fullscreenElement ? '退出全屏' : '进入全屏'); });
+  document.addEventListener('visibilitychange', () => { tick(); if (!document.hidden) syncMusic(); }); window.addEventListener('pageshow', () => { tick(); syncMusic(); });
+  window.setInterval(tick, 100); render(); renderMusicStatus();
+  if (document.modelContext?.registerTool) {
+    const lifecycle = new AbortController();
+    const result = () => ({ mode, status, durationSeconds: duration / 1000, elapsedSeconds: Math.floor(elapsedNow() / 1000) });
+    const tool = { name: 'control_timer', title: '控制此刻计时器', description: '设置或操作 0–100 小时的计时器；configure 只设置，不开始计时。', inputSchema: { type: 'object', properties: { action: { type: 'string', enum: ['read', 'configure', 'start', 'pause', 'reset'] }, mode: { type: 'string', enum: ['countdown', 'stopwatch'] }, seconds: { type: 'integer', minimum: 0, maximum: 360000 } }, required: ['action'], additionalProperties: false }, annotations: { readOnlyHint: false, untrustedContentHint: false }, execute(input) {
+      if (!input || typeof input !== 'object' || !['read', 'configure', 'start', 'pause', 'reset'].includes(input.action) || Object.keys(input).some(k => !['action', 'mode', 'seconds'].includes(k))) throw new Error('无效的操作');
+      if (input.mode !== undefined && !['countdown', 'stopwatch'].includes(input.mode)) throw new Error('无效模式');
+      if (input.seconds !== undefined && (!Number.isInteger(input.seconds) || input.seconds < 0 || input.seconds > 360000)) throw new Error('时长必须是 0–360000 之间的整数秒');
+      if (input.action !== 'configure' && (input.mode !== undefined || input.seconds !== undefined)) throw new Error('请使用 configure 设置模式和时长');
+      if (input.action === 'configure') { if (status === 'running' || status === 'paused') throw new Error('请先重置当前计时'); setMode(input.mode || mode); if (input.seconds !== undefined) { const nums = parts(input.seconds); fields.forEach((f, i) => f.value = nums[i]); readDuration(); } }
+      if (input.action === 'start') { if (status === 'running') return result(); if (mode === 'countdown' && (!valid || duration === 0)) throw new Error('请先设置有效的非零时长'); startPause(); }
+      if (input.action === 'pause' && status === 'running') startPause();
+      if (input.action === 'reset') reset();
+      tick(); return result();
+    } };
+    try { Promise.resolve(document.modelContext.registerTool(tool, { signal: lifecycle.signal })).catch(() => {}); } catch (_) {}
+  }
+})();
+
+});
+</script>
+</head>
+<body>
+<div class="tech-background" aria-hidden="true">
+  <div class="aurora aurora-cool"></div>
+  <div class="aurora aurora-warm"></div>
+  <div class="space-grid"></div>
+  <div class="orbital-rings"></div>
+  <div class="perspective-grid"></div>
+  <div class="light-streams"><i></i><i></i><i></i><i></i></div>
+  <div class="horizon-glow"></div>
+</div>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="此刻计时器首页"><span class="brand-mark" aria-hidden="true">◷</span><strong>此刻<span>计时器</span></strong></a>
+    <div class="header-end"><span class="range-label">0 — 100 HOURS</span><button class="icon-button" id="fullscreen" aria-label="进入全屏" title="全屏"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button></div>
+  </header>
+  <main>
+    <div class="intro"><span class="eyebrow">PRECISION TIMER / 100 H</span><h1>专注此刻，<span>掌控时间。</span></h1></div>
+    <section class="workspace" aria-label="计时器">
+      <aside class="settings">
+        <div class="mode-tabs" role="tablist" aria-label="计时模式"><button role="tab" id="countdown-tab" aria-selected="true" aria-controls="timer-panel" data-mode="countdown">倒计时</button><button role="tab" id="stopwatch-tab" aria-selected="false" aria-controls="timer-panel" data-mode="stopwatch" tabindex="-1">正计时</button></div>
+        <div id="duration-settings">
+          <div class="section-heading"><h2>设置时长</h2><span>最长 100 小时</span></div>
+          <div class="duration-inputs"><label><input id="hours" type="number" min="0" max="100" step="1" value="0" inputmode="numeric" aria-label="小时" aria-describedby="input-error"><span>小时</span></label><span class="input-colon">:</span><label><input id="minutes" type="number" min="0" max="59" step="1" value="25" inputmode="numeric" aria-label="分钟" aria-describedby="input-error"><span>分钟</span></label><span class="input-colon">:</span><label><input id="seconds" type="number" min="0" max="59" step="1" value="0" inputmode="numeric" aria-label="秒" aria-describedby="input-error"><span>秒</span></label></div>
+          <p id="input-error" class="input-error" role="alert"></p>
+          <div class="presets" aria-label="常用时长"><button data-seconds="300">5 分钟</button><button data-seconds="1500" class="selected">25 分钟</button><button data-seconds="3600">1 小时</button><button data-seconds="360000">100 小时</button></div>
+        </div>
+        <div id="stopwatch-settings" hidden><div class="section-heading"><h2>从零开始</h2><span>最长 100 小时</span></div><p class="stopwatch-copy">无需设置时长。按下开始，记录每一秒。</p><div class="limit"><span>计时上限</span><strong>100:00:00</strong></div></div>
+        <div class="settings-bottom">
+          <div class="music-controls">
+            <label class="sound-label music-label"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13M9 8l11-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/></svg>计时背景音乐</span><input id="music" type="checkbox" checked role="switch"><span class="switch" aria-hidden="true"></span></label>
+            <p class="music-track">星际漫游 <span>· 轻电子</span></p>
+            <div class="music-volume"><label for="music-volume">音量</label><input id="music-volume" type="range" min="0" max="100" step="1" value="35" aria-label="背景音乐音量"><output id="music-volume-value" for="music-volume">35%</output></div>
+            <p id="music-status" class="music-status" role="status">开始计时后播放</p>
+          </div>
+          <label class="sound-label"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11 5-6 4H2v6h3l6 4V5Zm4 3a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg>到时声音提醒</span><input id="sound" type="checkbox" checked role="switch"><span class="switch" aria-hidden="true"></span></label><p class="small-note">保持页面打开，以便收到提醒。设备休眠时，声音可能延迟。</p></div>
+      </aside>
+      <div class="timer-panel" id="timer-panel" role="tabpanel" aria-labelledby="countdown-tab">
+        <div class="panel-grid" aria-hidden="true"></div>
+        <div class="timer-topline"><span id="mode-label">倒计时</span><span class="status" id="status" role="status">准备就绪</span></div>
+        <div class="dial-wrap"><svg class="dial" viewBox="0 0 440 440" aria-hidden="true"><circle class="dial-track" cx="220" cy="220" r="206"/><circle class="dial-progress" id="dial-progress" cx="220" cy="220" r="206"/><circle class="dial-inner" cx="220" cy="220" r="187"/></svg><div class="timer-face"><p id="timer-caption">剩余时间</p><div class="digits" id="digits" role="timer" aria-label="剩余时间 0 小时 25 分钟 0 秒"><span id="display-hours">00</span><b>:</b><span id="display-minutes">25</span><b>:</b><span id="display-seconds">00</span></div><div class="digit-labels" aria-hidden="true"><span>小时</span><i></i><span>分钟</span><i></i><span>秒</span></div><p class="timer-detail" id="timer-detail">共 25 分钟</p></div></div>
+        <div class="actions"><button class="reset-button" id="reset" aria-label="重置计时器"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a9 9 0 1 1 2 8M3 3v7h7"/></svg><span>重置</span></button><button class="primary-button" id="start"><svg id="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7Z"/></svg><span id="start-label">开始计时</span></button></div>
+        <p class="keyboard-hint"><kbd>Space</kbd> 开始 / 暂停</p>
+      </div>
+    </section>
+    <footer><span>一秒一秒，做好眼前的事。</span><span>此刻 <i>·</i> JUST NOW</span></footer>
+  </main>
+</div>
+<div id="completion" class="completion" role="status" hidden><span class="completion-symbol">✓</span><div><strong id="completion-title">时间到</strong><p id="completion-text">这一段时间，完成了。</p></div><button id="dismiss" aria-label="关闭完成提示">×</button></div>
+</body>
+</html>
