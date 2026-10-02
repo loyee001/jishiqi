@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070d1b">
+  <meta name="description" content="简洁好用的计时器，支持 0–100 小时倒计时与正计时，暂停、继续和到时声音提醒。">
+  <title>此刻 · 100 小时计时器</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%23070d1b'/%3E%3Ccircle cx='20' cy='22' r='12' fill='none' stroke='%2357dbff' stroke-width='3'/%3E%3Cpath d='M20 14v8l5 3M15 4h10' fill='none' stroke='%2357dbff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="music.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+<div class="tech-background" aria-hidden="true">
+  <div class="aurora aurora-cool"></div>
+  <div class="aurora aurora-warm"></div>
+  <div class="space-grid"></div>
+  <div class="orbital-rings"></div>
+  <div class="perspective-grid"></div>
+  <div class="light-streams"><i></i><i></i><i></i><i></i></div>
+  <div class="horizon-glow"></div>
+</div>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="此刻计时器首页"><span class="brand-mark" aria-hidden="true">◷</span><strong>此刻<span>计时器</span></strong></a>
+    <div class="header-end"><span class="range-label">0 — 100 HOURS</span><button class="icon-button" id="fullscreen" aria-label="进入全屏" title="全屏"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button></div>
+  </header>
+  <main>
+    <div class="intro"><span class="eyebrow">PRECISION TIMER / 100 H</span><h1>专注此刻，<span>掌控时间。</span></h1></div>
+    <section class="workspace" aria-label="计时器">
+      <aside class="settings">
+        <div class="mode-tabs" role="tablist" aria-label="计时模式"><button role="tab" id="countdown-tab" aria-selected="true" aria-controls="timer-panel" data-mode="countdown">倒计时</button><button role="tab" id="stopwatch-tab" aria-selected="false" aria-controls="timer-panel" data-mode="stopwatch" tabindex="-1">正计时</button></div>
+        <div id="duration-settings">
+          <div class="section-heading"><h2>设置时长</h2><span>最长 100 小时</span></div>
+          <div class="duration-inputs"><label><input id="hours" type="number" min="0" max="100" step="1" value="0" inputmode="numeric" aria-label="小时" aria-describedby="input-error"><span>小时</span></label><span class="input-colon">:</span><label><input id="minutes" type="number" min="0" max="59" step="1" value="25" inputmode="numeric" aria-label="分钟" aria-describedby="input-error"><span>分钟</span></label><span class="input-colon">:</span><label><input id="seconds" type="number" min="0" max="59" step="1" value="0" inputmode="numeric" aria-label="秒" aria-describedby="input-error"><span>秒</span></label></div>
+          <p id="input-error" class="input-error" role="alert"></p>
+          <div class="presets" aria-label="常用时长"><button data-seconds="300">5 分钟</button><button data-seconds="1500" class="selected">25 分钟</button><button data-seconds="3600">1 小时</button><button data-seconds="360000">100 小时</button></div>
+        </div>
+        <div id="stopwatch-settings" hidden><div class="section-heading"><h2>从零开始</h2><span>最长 100 小时</span></div><p class="stopwatch-copy">无需设置时长。按下开始，记录每一秒。</p><div class="limit"><span>计时上限</span><strong>100:00:00</strong></div></div>
+        <div class="settings-bottom">
+          <div class="music-controls">
+            <label class="sound-label music-label"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13M9 8l11-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/></svg>计时背景音乐</span><input id="music" type="checkbox" checked role="switch"><span class="switch" aria-hidden="true"></span></label>
+            <p class="music-track">星际漫游 <span>· 轻电子</span></p>
+            <div class="music-volume"><label for="music-volume">音量</label><input id="music-volume" type="range" min="0" max="100" step="1" value="35" aria-label="背景音乐音量"><output id="music-volume-value" for="music-volume">35%</output></div>
+            <p id="music-status" class="music-status" role="status">开始计时后播放</p>
+          </div>
+          <label class="sound-label"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11 5-6 4H2v6h3l6 4V5Zm4 3a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg>到时声音提醒</span><input id="sound" type="checkbox" checked role="switch"><span class="switch" aria-hidden="true"></span></label><p class="small-note">保持页面打开，以便收到提醒。设备休眠时，声音可能延迟。</p></div>
+      </aside>
+      <div class="timer-panel" id="timer-panel" role="tabpanel" aria-labelledby="countdown-tab">
+        <div class="panel-grid" aria-hidden="true"></div>
+        <div class="timer-topline"><span id="mode-label">倒计时</span><span class="status" id="status" role="status">准备就绪</span></div>
+        <div class="dial-wrap"><svg class="dial" viewBox="0 0 440 440" aria-hidden="true"><circle class="dial-track" cx="220" cy="220" r="206"/><circle class="dial-progress" id="dial-progress" cx="220" cy="220" r="206"/><circle class="dial-inner" cx="220" cy="220" r="187"/></svg><div class="timer-face"><p id="timer-caption">剩余时间</p><div class="digits" id="digits" role="timer" aria-label="剩余时间 0 小时 25 分钟 0 秒"><span id="display-hours">00</span><b>:</b><span id="display-minutes">25</span><b>:</b><span id="display-seconds">00</span></div><div class="digit-labels" aria-hidden="true"><span>小时</span><i></i><span>分钟</span><i></i><span>秒</span></div><p class="timer-detail" id="timer-detail">共 25 分钟</p></div></div>
+        <div class="actions"><button class="reset-button" id="reset" aria-label="重置计时器"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a9 9 0 1 1 2 8M3 3v7h7"/></svg><span>重置</span></button><button class="primary-button" id="start"><svg id="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7Z"/></svg><span id="start-label">开始计时</span></button></div>
+        <p class="keyboard-hint"><kbd>Space</kbd> 开始 / 暂停</p>
+      </div>
+    </section>
+    <footer><span>一秒一秒，做好眼前的事。</span><span>此刻 <i>·</i> JUST NOW</span></footer>
+  </main>
+</div>
+<div id="completion" class="completion" role="status" hidden><span class="completion-symbol">✓</span><div><strong id="completion-title">时间到</strong><p id="completion-text">这一段时间，完成了。</p></div><button id="dismiss" aria-label="关闭完成提示">×</button></div>
+</body>
+</html>
