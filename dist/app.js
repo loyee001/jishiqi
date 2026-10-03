@@ -91,7 +91,7 @@
     else if (musicIssue || music?.error) text = musicIssue || music.error;
     else if (Number($('music-volume').value) === 0) text = '音量为 0，已静音';
     else if (status === 'paused') text = '已随计时暂停';
-    else if (status === 'running') text = music?.playing ? '正在播放 · BBC Countdown 2013' : '正在加载在线音乐…';
+    else if (status === 'running') text = music?.completed ? '音乐已播放完毕' : music?.playing ? '正在播放 · BBC Countdown 2013' : '正在加载在线音乐…';
     else if (status === 'done') text = '计时结束，音乐已停止';
     if ($('music-status').textContent !== text) $('music-status').textContent = text;
     $('music-status').classList.toggle('is-playing', !!(status === 'running' && music?.playing && $('music').checked && Number($('music-volume').value) > 0));
@@ -112,7 +112,7 @@
       // Keep the online player's stop time aligned with the timer deadline.
       const remaining = (limit - elapsedNow()) / 1000;
       if (remaining <= 0) { tick(); return; }
-      await music.start(remaining);
+      await music.start(remaining, { countdown: mode === 'countdown', totalSeconds: duration / 1000 });
     } catch (_) {
       if (revision === musicRevision) musicIssue = '音乐未能播放，请检查网络后重新开启';
     }
