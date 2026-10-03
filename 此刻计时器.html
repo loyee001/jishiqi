@@ -191,6 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
       this.countdownDuration = 0;
       this.seekStartedAt = null;
       this.seekLatency = 0;
+      this.tailSeekPending = false;
       this.audio.addEventListener('loadedmetadata', () => {
         if (!this.requested) return;
         this.tail = Number.isFinite(this.audio.duration) && this.audio.duration > 0 &&
@@ -247,13 +248,15 @@ document.addEventListener("DOMContentLoaded", () => {
     alignTail(forceSeek = false) {
       if (!this.requested || !this.tail) return;
       if (this.expired()) { this.pause(true); return; }
+      if (forceSeek) this.tailSeekPending = true;
       const length = this.audio.duration;
       if (!Number.isFinite(length) || length <= 0 || this.audio.seeking) return;
       const remaining = (this.deadline - Date.now()) / 1000;
       const target = Math.max(0, length - remaining);
       // Do not chase the latency of our own seek with yet another seek.
       const tolerance = Math.max(0.25, this.seekLatency + 0.05);
-      if (forceSeek || (remaining > 2 && Math.abs(this.audio.currentTime - target) > tolerance)) {
+      if (this.tailSeekPending || (remaining > 2 && Math.abs(this.audio.currentTime - target) > tolerance)) {
+        this.tailSeekPending = false;
         this.audio.muted = true;
         this.loading = true;
         this.seekStartedAt = Date.now();
@@ -319,6 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
       this.error = '';
       this.deadline = 0;
       this.seekStartedAt = null;
+      this.tailSeekPending = false;
       clearTimeout(this.stopTimer);
       this.stopTimer = null;
       this.audio.pause();
