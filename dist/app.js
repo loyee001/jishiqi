@@ -160,6 +160,112 @@
     $('mode-label').textContent = mode === 'countdown' ? '倒计时' : '正计时';
     $('timer-caption').textContent = mode === 'countdown' ? '剩余时间' : '已经过时间'; render();
   }
+  function commandMessage(text, kind = '') {
+    $('command-status').textContent = text;
+    $('command-status').className = `command-status ${kind}`;
+    $('command-input').setAttribute('aria-invalid', String(kind === 'error'));
+  }
+  function executeCommand(text) {
+    const command = window.TimerCommands.parse(text);
+    if (command.error) { commandMessage(command.error, 'error'); return; }
+    tick();
+    if (command.action === 'countdown' || command.action === 'stopwatch') {
+      reset(); setMode(command.action === 'countdown' ? 'countdown' : 'stopwatch');
+      if (command.action === 'countdown') {
+        fields.forEach((field, i) => field.value = parts(command.seconds)[i]);
+        readDuration();
+      }
+      startPause();
+      commandMessage(command.action === 'countdown' ? `已开始 ${human(command.seconds * 1000)}倒计时。` : '已开始正计时。', 'success');
+    } else if (command.action === 'reset') {
+      reset(); commandMessage('已重置计时器。', 'success');
+    } else if (command.action === 'pause') {
+      if (status === 'running') startPause();
+      commandMessage(status === 'paused' ? '计时已暂停。' : '当前没有正在进行的计时。', 'success');
+    } else if (command.action === 'resume') {
+      if (status === 'paused') startPause();
+      commandMessage(status === 'running' ? '计时正在进行。' : '当前没有暂停的计时。', 'success');
+    } else {
+      if (status !== 'running') startPause();
+      commandMessage(status === 'running' ? '计时已开始。' : '请先设置至少 1 秒的有效时长。', status === 'running' ? 'success' : 'error');
+    }
+  }
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null, composingCommand = false;
+  function voiceButton(active) {
+    $('voice-button').classList.toggle('is-listening', active);
+    $('voice-button').setAttribute('aria-pressed', String(active));
+    $('voice-button').setAttribute('aria-label', active ? '取消语音输入' : '开始语音输入');
+    $('voice-button').title = active ? '点击取消语音输入' : '点击后说出计时指令';
+  }
+  function cancelVoice() {
+    const current = recognition; recognition = null;
+    if (current) current.abort();
+    voiceButton(false);
+  }
+  $('command-form').addEventListener('submit', event => {
+    event.preventDefault();
+    if (composingCommand) return;
+    cancelVoice(); executeCommand($('command-input').value);
+  });
+  $('command-input').addEventListener('compositionstart', () => composingCommand = true);
+  $('command-input').addEventListener('compositionend', () => composingCommand = false);
+  $('command-input').addEventListener('keydown', event => {
+    if (event.key === 'Enter' && (composingCommand || event.isComposing || event.keyCode === 229)) event.preventDefault();
+  });
+  $('command-input').addEventListener('input', () => {
+    if (recognition) cancelVoice();
+    commandMessage('按回车或点“执行”，运行输入的指令。');
+  });
+  if (!Recognition || !window.isSecureContext) {
+    $('voice-button').disabled = true;
+    $('voice-button').title = '当前浏览器不支持语音输入';
+    commandMessage('当前浏览器不支持语音，请输入指令后按回车；也可使用系统键盘语音输入。');
+  } else $('voice-button').addEventListener('click', () => {
+    if (recognition) { cancelVoice(); commandMessage('已取消语音输入。'); return; }
+    const current = new Recognition();
+    recognition = current;
+    current.lang = 'zh-CN'; current.continuous = false; current.interimResults = true; current.maxAlternatives = 1;
+    let received = false, failed = false;
+    const isCurrent = () => recognition === current;
+    voiceButton(true); unlockAudio();
+    commandMessage('正在连接麦克风…首次使用请允许麦克风权限。');
+    current.onstart = () => { if (isCurrent()) commandMessage('正在聆听…请说“倒计时4分钟”。'); };
+    current.onresult = event => {
+      if (!isCurrent() || received || failed) return;
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i];
+        $('command-input').value = result[0].transcript.slice(0, 100);
+        if (result.isFinal) {
+          received = true; current.stop(); voiceButton(false);
+          executeCommand(result[0].transcript); break;
+        }
+        commandMessage(`听到：${result[0].transcript}…`);
+      }
+    };
+    current.onerror = event => {
+      if (!isCurrent() || received) return;
+      failed = true; voiceButton(false);
+      const errors = {
+        'not-allowed': '未获得麦克风权限。请在浏览器中允许麦克风，或直接输入指令。',
+        'service-not-allowed': '当前浏览器无法使用语音服务，请直接输入指令。',
+        'audio-capture': '未找到可用麦克风，请检查设备或直接输入指令。',
+        'no-speech': '没有听清，请再试一次，或直接输入指令。',
+        'network': '语音服务连接失败，请检查网络，或直接输入指令。',
+        'language-not-supported': '当前语音服务不支持中文，请直接输入指令。',
+        'aborted': '语音输入已取消。'
+      };
+      commandMessage(errors[event.error] || '语音识别未完成，请重试或直接输入指令。', 'error');
+    };
+    current.onend = () => {
+      if (!isCurrent()) return;
+      recognition = null; voiceButton(false);
+      if (!received && !failed) commandMessage('没有听清，请再试一次，或直接输入指令。', 'error');
+    };
+    try { current.start(); }
+    catch (_) { recognition = null; voiceButton(false); commandMessage('无法启动语音，请重试或直接输入指令。', 'error'); }
+  });
+  window.addEventListener('pagehide', cancelVoice);
   tabs.forEach(el => { el.addEventListener('click', () => setMode(el.dataset.mode)); el.addEventListener('keydown', e => { if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) { e.preventDefault(); const next = e.key === 'Home' ? tabs[0] : e.key === 'End' ? tabs[1] : tabs.find(t => t !== el); setMode(next.dataset.mode); next.focus(); } }); });
   fields.forEach(el => el.addEventListener('input', readDuration));
   presets.forEach(el => el.addEventListener('click', () => { const nums = parts(Number(el.dataset.seconds)); fields.forEach((f, i) => f.value = nums[i]); readDuration(); }));

@@ -9,6 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%23070d1b'/%3E%3Ccircle cx='20' cy='22' r='12' fill='none' stroke='%2357dbff' stroke-width='3'/%3E%3Cpath d='M20 14v8l5 3M15 4h10' fill='none' stroke='%2357dbff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
   <script src="music.js" defer></script>
+  <script src="commands.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -30,6 +31,12 @@
     <div class="intro"><span class="eyebrow">PRECISION TIMER / 100 H</span><h1>专注此刻，<span>掌控时间。</span></h1></div>
     <section class="workspace" aria-label="计时器">
       <aside class="settings">
+        <form class="command-console" id="command-form" aria-label="语音与文字指令">
+          <div class="command-heading"><label for="command-input">语音指令</label><span>VOICE CONTROL</span></div>
+          <div class="command-entry"><input id="command-input" type="text" maxlength="100" placeholder="例如：倒计时4分钟" autocomplete="off" enterkeyhint="go" aria-describedby="command-help command-status"><button type="button" id="voice-button" class="voice-button" aria-label="开始语音输入" aria-pressed="false" title="点击后说出计时指令"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg></button></div>
+          <div class="command-footer"><span id="command-help">说出或输入指令，自动开始</span><button type="submit" class="command-submit">执行 <span aria-hidden="true">↵</span></button></div>
+          <p id="command-status" class="command-status" role="status" aria-live="polite">点麦克风说“倒计时4分钟”；也支持暂停、继续、重置。</p>
+        </form>
         <div class="mode-tabs" role="tablist" aria-label="计时模式"><button role="tab" id="countdown-tab" aria-selected="true" aria-controls="timer-panel" data-mode="countdown">倒计时</button><button role="tab" id="stopwatch-tab" aria-selected="false" aria-controls="timer-panel" data-mode="stopwatch" tabindex="-1">正计时</button></div>
         <div id="duration-settings">
           <div class="section-heading"><h2>设置时长</h2><span>最长 100 小时</span></div>

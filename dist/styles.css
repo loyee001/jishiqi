@@ -151,3 +151,34 @@ footer { color: #b1c8dc; }
 .music-status { margin: 10px 0 0; min-height: 20px; font-size: 12px; color: #a9bdd3; line-height: 1.6; }
 .music-status.is-playing { color: #9cf3d9; }
 @media(max-width:680px) { .music-controls { padding-bottom: 16px; margin-bottom: 17px; }.music-volume input { height: 28px; } }
+
+/* Voice and keyboard share the same command console. */
+.command-console { min-width: 0; margin: 0 0 24px; padding: 16px 14px 12px; border: 1px solid #80d8fa69; border-radius: 8px; background: linear-gradient(145deg, #12475770, #22224a80); box-shadow: inset 0 1px #c1f5ff1f, 0 0 24px #4ce0ff0b; }
+.command-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.command-heading label { color: #e6f7ff; font-size: 14px; font-weight: 600; }
+.command-heading > span { font-size: 9px; letter-spacing: 1.2px; color: #9dcde5; }
+.command-entry { display: flex; gap: 7px; min-width: 0; }
+.command-entry input { flex: 1; width: 0; min-width: 0; border: 1px solid #6499bc80; border-radius: 5px; padding: 11px 10px; background: #061627cc; color: #e8f8ff; font: inherit; font-size: 14px; }
+.command-entry input::placeholder { color: #93adc3; }
+.command-entry input[aria-invalid=true] { border-color: #ffb1b9; }
+.command-console button { color: #c7f4ff; border: 1px solid #86dcfa77; border-radius: 5px; background: #123a52; }
+.voice-button { width: 42px; min-height: 42px; flex-shrink: 0; display: grid; place-items: center; }
+.voice-button svg { width: 19px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+.voice-button:hover { background: #20536b; }
+.voice-button.is-listening { color: #fff; background: #913750; border-color: #ffb1ca; box-shadow: 0 0 14px #ff578f66; }
+.voice-button:disabled { opacity: .45; cursor: not-allowed; }
+.command-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 9px; }
+.command-footer > span { font-size: 11px; color: #aac8dc; line-height: 1.5; }
+.command-submit { min-height: 36px; padding: 6px 11px; white-space: nowrap; font-size: 12px; }
+.command-submit:hover { background: #20536b; }
+.command-submit span { padding-left: 3px; color: #87c8df; }
+.command-status { min-height: 34px; margin: 9px 0 0; color: #a9c6de; font-size: 11px; line-height: 1.6; overflow-wrap: anywhere; }
+.command-status.success { color: #a0f4d9; }
+.command-status.error { color: #ffc2c8; }
+@media(max-width:680px) {
+  .command-console { order: -3; margin: 20px 20px 0; padding: 14px 14px 10px; }
+  .command-entry input { font-size: 16px; }
+  .command-status { min-height: 0; font-size: 12px; }
+  .command-footer > span { font-size: 12px; }
+  .command-submit { min-height: 40px; }
+}
