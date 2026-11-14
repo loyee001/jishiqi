@@ -162,10 +162,40 @@ footer { color: #b1c8dc; }
 .music-status.is-playing { color: #9cf3d9; }
 @media(max-width:680px) { .music-controls { padding-bottom: 16px; margin-bottom: 17px; }.music-volume input { height: 28px; } }
 
+/* Voice and keyboard share the same command console. */
+.command-console { min-width: 0; margin: 0 0 24px; padding: 16px 14px 12px; border: 1px solid #80d8fa69; border-radius: 8px; background: linear-gradient(145deg, #12475770, #22224a80); box-shadow: inset 0 1px #c1f5ff1f, 0 0 24px #4ce0ff0b; }
+.command-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.command-heading label { color: #e6f7ff; font-size: 14px; font-weight: 600; }
+.command-heading > span { font-size: 9px; letter-spacing: 1.2px; color: #9dcde5; }
+.command-entry { display: flex; gap: 7px; min-width: 0; }
+.command-entry input { flex: 1; width: 0; min-width: 0; border: 1px solid #6499bc80; border-radius: 5px; padding: 11px 10px; background: #061627cc; color: #e8f8ff; font: inherit; font-size: 14px; }
+.command-entry input::placeholder { color: #93adc3; }
+.command-entry input[aria-invalid=true] { border-color: #ffb1b9; }
+.command-console button { color: #c7f4ff; border: 1px solid #86dcfa77; border-radius: 5px; background: #123a52; }
+.voice-button { width: 42px; min-height: 42px; flex-shrink: 0; display: grid; place-items: center; }
+.voice-button svg { width: 19px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+.voice-button:hover { background: #20536b; }
+.voice-button.is-listening { color: #fff; background: #913750; border-color: #ffb1ca; box-shadow: 0 0 14px #ff578f66; }
+.voice-button:disabled { opacity: .45; cursor: not-allowed; }
+.command-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 9px; }
+.command-footer > span { font-size: 11px; color: #aac8dc; line-height: 1.5; }
+.command-submit { min-height: 36px; padding: 6px 11px; white-space: nowrap; font-size: 12px; }
+.command-submit:hover { background: #20536b; }
+.command-submit span { padding-left: 3px; color: #87c8df; }
+.command-status { min-height: 34px; margin: 9px 0 0; color: #a9c6de; font-size: 11px; line-height: 1.6; overflow-wrap: anywhere; }
+.command-status.success { color: #a0f4d9; }
+.command-status.error { color: #ffc2c8; }
+@media(max-width:680px) {
+  .command-console { order: -3; margin: 20px 20px 0; padding: 14px 14px 10px; }
+  .command-entry input { font-size: 16px; }
+  .command-status { min-height: 0; font-size: 12px; }
+  .command-footer > span { font-size: 12px; }
+  .command-submit { min-height: 40px; }
+}
+
 </style>
-  
   <script>
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
 (() => {
   'use strict';
   // Stream the composer's published player source; no audio is bundled here.
@@ -338,6 +368,75 @@ document.addEventListener("DOMContentLoaded", () => {
   window.TimerMusic = TimerMusic;
 })();
 
+});
+</script>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+(function (root) {
+  'use strict';
+  const MAX_SECONDS = 360000;
+  const digits = { 零: 0, 〇: 0, 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
+  function number(text) {
+    if (text === '半') return 0.5;
+    if (/^\d+(?:\.\d+)?$/.test(text)) return Number(text);
+    if (!/^[零〇一二两三四五六七八九十百千]+$/.test(text)) return NaN;
+    if (!/[十百千]/.test(text)) return Number([...text].map(char => digits[char]).join(''));
+    let total = 0, digit = null, previousUnit = Infinity;
+    for (const char of text) {
+      if (char in digits) {
+        if (digit !== null && digit !== 0) return NaN;
+        digit = digits[char];
+      } else {
+        const unit = { 十: 10, 百: 100, 千: 1000 }[char];
+        if (unit >= previousUnit) return NaN;
+        total += (digit === null ? 1 : digit) * unit;
+        digit = null; previousUnit = unit;
+      }
+    }
+    return total + (digit || 0);
+  }
+  function parseDuration(text) {
+    const pattern = /([0-9]+(?:\.[0-9]+)?|[零〇一二两三四五六七八九十百千]+|半)(个小时|小时|钟头|分钟|分|秒钟|秒)(半)?/gy;
+    let seconds = 0, position = 0, previousUnit = Infinity, match;
+    while ((match = pattern.exec(text))) {
+      if (match.index !== position) return NaN;
+      const unit = /小时|钟头/.test(match[2]) ? 3600 : /分/.test(match[2]) ? 60 : 1;
+      if (unit >= previousUnit) return NaN;
+      const value = number(match[1]);
+      if (!Number.isFinite(value) || (match[3] && (value % 1 || unit === 1))) return NaN;
+      seconds += (value + (match[3] ? 0.5 : 0)) * unit;
+      position = pattern.lastIndex; previousUnit = unit;
+    }
+    return position === text.length && position > 0 ? seconds : NaN;
+  }
+  function parse(input) {
+    if (typeof input !== 'string' || input.length > 100) return { error: '指令太长，请只说一条计时指令。' };
+    let text = input.normalize('NFKC').trim().replace(/\s+/g, '').replace(/[。.!！?？]+$/g, '');
+    text = text.replace(/計時/g, '计时').replace(/分鐘/g, '分钟').replace(/小時/g, '小时').replace(/兩/g, '两');
+    text = text.replace(/^(?:请)?(?:帮我)?/, '');
+    if (!text) return { error: '请输入指令，例如“倒计时4分钟”。' };
+    if (/^(?:暂停|暂停计时|暂停倒计时)$/.test(text)) return { action: 'pause' };
+    if (/^(?:继续|继续计时|继续倒计时|恢复计时)$/.test(text)) return { action: 'resume' };
+    if (/^(?:重置|重置计时|重置计时器|取消计时)$/.test(text)) return { action: 'reset' };
+    if (/^(?:开始|开始计时)$/.test(text)) return { action: 'start' };
+    if (/^(?:开始)?正计时$/.test(text)) return { action: 'stopwatch' };
+    const countdown = text.match(/^(?:开始)?倒计时(.+?)(?:并开始|立即开始|开始计时)?$/);
+    if (!countdown) return { error: '没听懂这条指令。试试“倒计时4分钟”“暂停”或“继续”。' };
+    const parsed = parseDuration(countdown[1]);
+    const seconds = Math.round(parsed);
+    if (!Number.isFinite(parsed)) return { error: '请说完整时长，例如“倒计时4分钟”或“倒计时一小时半”。' };
+    if (Math.abs(parsed - seconds) > 1e-7 || seconds < 1 || seconds > MAX_SECONDS) return { error: '倒计时须为 1 秒到 100 小时，且精确到整秒。' };
+    return { action: 'countdown', seconds };
+  }
+  const api = { parse };
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.TimerCommands = api;
+})(typeof window === 'undefined' ? globalThis : window);
+
+});
+</script>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
 (() => {
   'use strict';
   const MAX = 100 * 60 * 60 * 1000;
@@ -500,6 +599,112 @@ document.addEventListener("DOMContentLoaded", () => {
     $('mode-label').textContent = mode === 'countdown' ? '倒计时' : '正计时';
     $('timer-caption').textContent = mode === 'countdown' ? '剩余时间' : '已经过时间'; render();
   }
+  function commandMessage(text, kind = '') {
+    $('command-status').textContent = text;
+    $('command-status').className = `command-status ${kind}`;
+    $('command-input').setAttribute('aria-invalid', String(kind === 'error'));
+  }
+  function executeCommand(text) {
+    const command = window.TimerCommands.parse(text);
+    if (command.error) { commandMessage(command.error, 'error'); return; }
+    tick();
+    if (command.action === 'countdown' || command.action === 'stopwatch') {
+      reset(); setMode(command.action === 'countdown' ? 'countdown' : 'stopwatch');
+      if (command.action === 'countdown') {
+        fields.forEach((field, i) => field.value = parts(command.seconds)[i]);
+        readDuration();
+      }
+      startPause();
+      commandMessage(command.action === 'countdown' ? `已开始 ${human(command.seconds * 1000)}倒计时。` : '已开始正计时。', 'success');
+    } else if (command.action === 'reset') {
+      reset(); commandMessage('已重置计时器。', 'success');
+    } else if (command.action === 'pause') {
+      if (status === 'running') startPause();
+      commandMessage(status === 'paused' ? '计时已暂停。' : '当前没有正在进行的计时。', 'success');
+    } else if (command.action === 'resume') {
+      if (status === 'paused') startPause();
+      commandMessage(status === 'running' ? '计时正在进行。' : '当前没有暂停的计时。', 'success');
+    } else {
+      if (status !== 'running') startPause();
+      commandMessage(status === 'running' ? '计时已开始。' : '请先设置至少 1 秒的有效时长。', status === 'running' ? 'success' : 'error');
+    }
+  }
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null, composingCommand = false;
+  function voiceButton(active) {
+    $('voice-button').classList.toggle('is-listening', active);
+    $('voice-button').setAttribute('aria-pressed', String(active));
+    $('voice-button').setAttribute('aria-label', active ? '取消语音输入' : '开始语音输入');
+    $('voice-button').title = active ? '点击取消语音输入' : '点击后说出计时指令';
+  }
+  function cancelVoice() {
+    const current = recognition; recognition = null;
+    if (current) current.abort();
+    voiceButton(false);
+  }
+  $('command-form').addEventListener('submit', event => {
+    event.preventDefault();
+    if (composingCommand) return;
+    cancelVoice(); executeCommand($('command-input').value);
+  });
+  $('command-input').addEventListener('compositionstart', () => composingCommand = true);
+  $('command-input').addEventListener('compositionend', () => composingCommand = false);
+  $('command-input').addEventListener('keydown', event => {
+    if (event.key === 'Enter' && (composingCommand || event.isComposing || event.keyCode === 229)) event.preventDefault();
+  });
+  $('command-input').addEventListener('input', () => {
+    if (recognition) cancelVoice();
+    commandMessage('按回车或点“执行”，运行输入的指令。');
+  });
+  if (!Recognition || !window.isSecureContext) {
+    $('voice-button').disabled = true;
+    $('voice-button').title = '当前浏览器不支持语音输入';
+    commandMessage('当前浏览器不支持语音，请输入指令后按回车；也可使用系统键盘语音输入。');
+  } else $('voice-button').addEventListener('click', () => {
+    if (recognition) { cancelVoice(); commandMessage('已取消语音输入。'); return; }
+    const current = new Recognition();
+    recognition = current;
+    current.lang = 'zh-CN'; current.continuous = false; current.interimResults = true; current.maxAlternatives = 1;
+    let received = false, failed = false;
+    const isCurrent = () => recognition === current;
+    voiceButton(true); unlockAudio();
+    commandMessage('正在连接麦克风…首次使用请允许麦克风权限。');
+    current.onstart = () => { if (isCurrent()) commandMessage('正在聆听…请说“倒计时4分钟”。'); };
+    current.onresult = event => {
+      if (!isCurrent() || received || failed) return;
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i];
+        $('command-input').value = result[0].transcript.slice(0, 100);
+        if (result.isFinal) {
+          received = true; current.stop(); voiceButton(false);
+          executeCommand(result[0].transcript); break;
+        }
+        commandMessage(`听到：${result[0].transcript}…`);
+      }
+    };
+    current.onerror = event => {
+      if (!isCurrent() || received) return;
+      failed = true; voiceButton(false);
+      const errors = {
+        'not-allowed': '未获得麦克风权限。请在浏览器中允许麦克风，或直接输入指令。',
+        'service-not-allowed': '当前浏览器无法使用语音服务，请直接输入指令。',
+        'audio-capture': '未找到可用麦克风，请检查设备或直接输入指令。',
+        'no-speech': '没有听清，请再试一次，或直接输入指令。',
+        'network': '语音服务连接失败，请检查网络，或直接输入指令。',
+        'language-not-supported': '当前语音服务不支持中文，请直接输入指令。',
+        'aborted': '语音输入已取消。'
+      };
+      commandMessage(errors[event.error] || '语音识别未完成，请重试或直接输入指令。', 'error');
+    };
+    current.onend = () => {
+      if (!isCurrent()) return;
+      recognition = null; voiceButton(false);
+      if (!received && !failed) commandMessage('没有听清，请再试一次，或直接输入指令。', 'error');
+    };
+    try { current.start(); }
+    catch (_) { recognition = null; voiceButton(false); commandMessage('无法启动语音，请重试或直接输入指令。', 'error'); }
+  });
+  window.addEventListener('pagehide', cancelVoice);
   tabs.forEach(el => { el.addEventListener('click', () => setMode(el.dataset.mode)); el.addEventListener('keydown', e => { if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) { e.preventDefault(); const next = e.key === 'Home' ? tabs[0] : e.key === 'End' ? tabs[1] : tabs.find(t => t !== el); setMode(next.dataset.mode); next.focus(); } }); });
   fields.forEach(el => el.addEventListener('input', readDuration));
   presets.forEach(el => el.addEventListener('click', () => { const nums = parts(Number(el.dataset.seconds)); fields.forEach((f, i) => f.value = nums[i]); readDuration(); }));
@@ -559,6 +764,12 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class="intro"><span class="eyebrow">PRECISION TIMER / 100 H</span><h1>专注此刻，<span>掌控时间。</span></h1></div>
     <section class="workspace" aria-label="计时器">
       <aside class="settings">
+        <form class="command-console" id="command-form" aria-label="语音与文字指令">
+          <div class="command-heading"><label for="command-input">语音指令</label><span>VOICE CONTROL</span></div>
+          <div class="command-entry"><input id="command-input" type="text" maxlength="100" placeholder="例如：倒计时4分钟" autocomplete="off" enterkeyhint="go" aria-describedby="command-help command-status"><button type="button" id="voice-button" class="voice-button" aria-label="开始语音输入" aria-pressed="false" title="点击后说出计时指令"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg></button></div>
+          <div class="command-footer"><span id="command-help">说出或输入指令，自动开始</span><button type="submit" class="command-submit">执行 <span aria-hidden="true">↵</span></button></div>
+          <p id="command-status" class="command-status" role="status" aria-live="polite">点麦克风说“倒计时4分钟”；也支持暂停、继续、重置。</p>
+        </form>
         <div class="mode-tabs" role="tablist" aria-label="计时模式"><button role="tab" id="countdown-tab" aria-selected="true" aria-controls="timer-panel" data-mode="countdown">倒计时</button><button role="tab" id="stopwatch-tab" aria-selected="false" aria-controls="timer-panel" data-mode="stopwatch" tabindex="-1">正计时</button></div>
         <div id="duration-settings">
           <div class="section-heading"><h2>设置时长</h2><span>最长 100 小时</span></div>
